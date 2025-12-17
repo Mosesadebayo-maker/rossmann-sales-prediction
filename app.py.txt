@@ -1,0 +1,37 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+import joblib
+
+@st.cache_resource
+def load_assets():
+    model = tf.keras.models.load_model('lstm_sales_model.h5')
+    x_scaler = joblib.load('X_scaler.pkl')
+    y_scaler = joblib.load('y_scaler.pkl')
+    return model, x_scaler, y_scaler
+
+model, x_scaler, y_scaler = load_assets()
+
+st.title("Rossmann Sales Predictor")
+
+with st.form("prediction_form"):
+    store_id = st.number_input("Store ID", min_value=1, step=1)
+    day_of_week = st.slider("Day of Week", 1, 7, 1)
+    promo = st.selectbox("Promo", [0, 1])
+    state_holiday = st.selectbox("State Holiday", [0, 1])
+    
+    submit = st.form_submit_button("Predict")
+
+if submit:
+    try:
+        features = np.array([[store_id, day_of_week, promo, state_holiday]])
+        features_scaled = x_scaler.transform(features)
+        features_reshaped = features_scaled.reshape((features_scaled.shape[0], 1, features_scaled.shape[1]))
+        
+        prediction_scaled = model.predict(features_reshaped)
+        prediction = y_scaler.inverse_transform(prediction_scaled)
+        
+        st.success(f"Predicted Sales: ${prediction[0][0]:,.2f}")
+    except Exception as e:
+        st.error(f"Error: {e}")
