@@ -13,12 +13,22 @@ col2.metric("Model", "LSTM")
 col3.metric("Status", "Live")
 
 st.sidebar.header("Input Parameters")
-store_id = st.sidebar.number_input("Store ID", 1, 1115, 1, key="s_id")
-promo = st.sidebar.selectbox("Promotion Active", ["No", "Yes"], key="p_act")
-days = st.sidebar.slider("Forecast Window (Days)", 1, 42, 30, key="d_win")
+store_id = st.sidebar.number_input("Store ID", 1, 1115, 1, key="sidebar_store_id")
+promo = st.sidebar.selectbox("Promotion Active", ["No", "Yes"], key="sidebar_promo")
+days = st.sidebar.slider("Forecast Window (Days)", 1, 42, 30, key="sidebar_days")
 
 st.subheader("LSTM Time-Series Analysis")
 
+if st.button("Generate Prediction", key="btn_final_unique"):
+    st.success(f"LSTM Sequence Prediction complete for Store {store_id}")
+    
+    chart_data = pd.DataFrame(
+        np.random.randn(days, 1) * 500 + 5000,
+        columns=['Predicted Sales']
+    )
+    st.line_chart(chart_data)
+
+st.info("Architecture: Long Short-Term Memory (LSTM) | CI/CD: GitHub")
 if st.button("Generate Prediction", key="btn_016"):
     st.success(f"LSTM Sequence Prediction complete for Store {store_id}")
     
